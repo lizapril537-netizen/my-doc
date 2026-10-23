@@ -22,6 +22,9 @@
     gap: 16px;
     font-size: 14px;
     color: #444;
+    position: sticky;
+    top: 0;
+    z-index: 100;
   }
   .top-menu .menu-item {
     padding: 4px 8px;
@@ -38,12 +41,15 @@
 
   /* Панель инструментов (Форматирование) */
   .toolbar {
-    background: #edf2fa; /* Цвет как в Google Docs */
+    background: #edf2fa;
     border-bottom: 1px solid #dadce0;
     padding: 8px 16px;
     display: flex;
     gap: 8px;
     align-items: center;
+    position: sticky;
+    top: 45px;
+    z-index: 100;
   }
   .tool-btn {
     background: none;
@@ -60,15 +66,23 @@
   .tool-btn.italic { font-style: italic; }
   .tool-btn.underline { text-decoration: underline; }
 
-  /* Лист документа */
+  /* Контейнер для листов */
+  .document-container {
+    padding: 20px 0 60px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px; /* Расстояние между листами */
+  }
+
+  /* Один лист документа */
   .page {
     background: #fff;
     width: 816px;
-    min-height: 1056px;
-    margin: 20px auto 60px;
+    min-height: 1056px; /* Пропорции листа А4/Letter */
     padding: 96px; /* Стандартные отступы Google Docs */
     box-shadow: 0 1px 3px rgba(60,64,67,.15);
-    font-family: Arial, sans-serif; /* В Docs по умолчанию Arial */
+    font-family: Arial, sans-serif;
     font-size: 11pt;
     line-height: 1.5;
     color: #000;
@@ -82,21 +96,19 @@
     margin-top: 0;
     margin-bottom: 12pt;
   }
-  .page h2 {
-    font-size: 16pt;
-    font-weight: normal;
-    margin-top: 18pt;
-    margin-bottom: 6pt;
-  }
   .page p {
     margin: 0 0 12pt 0;
   }
-  
-  /* Разделитель между текстами */
-  .divider {
-    border: 0;
-    border-top: 1px solid #dadce0;
-    margin: 40px 0;
+
+  /* Адаптив для планшетов и телефонов */
+  @media (max-width: 850px) {
+    .page {
+      width: 100%;
+      min-height: auto;
+      padding: 40px 20px;
+      box-shadow: none;
+      border-bottom: 10px solid #f9fbfd; /* Имитация расстояния между листами */
+    }
   }
 
   /* Плавающая кнопка сохранения */
@@ -113,6 +125,7 @@
     transition: opacity .3s;
     pointer-events: none;
     box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    z-index: 1000;
   }
   .status.show { opacity: 1; }
 </style>
@@ -143,47 +156,60 @@
   <button class="tool-btn underline">U</button>
 </div>
 
-<!-- Сам документ (редактируемый) -->
-<div class="page" contenteditable="true" spellcheck="false">
+<!-- Контейнер с тремя листами -->
+<div class="document-container">
 
-  <h1>Текст 1: Заголовок</h1>
-  <p>Это первый текст. Кликни сюда и редактируй — всё сохранится автоматически. Здесь можно писать что угодно, как в обычном Google Документе.</p>
-  <p>Попробуй выделить этот текст и нажать <b>Ctrl+B</b> (или <b>Cmd+B</b> на Mac), чтобы сделать его жирным.</p>
+  <!-- Лист 1 -->
+  <div class="page" contenteditable="true" spellcheck="false" data-page="1">
+    <h1>Текст 1: Заголовок</h1>
+    <p>Это первый текст на первом листе. Кликни сюда и редактируй — всё сохранится автоматически.</p>
+    <p>Здесь можно писать что угодно, как в обычном Google Документе. Просто скролль вниз, чтобы увидеть второй лист.</p>
+  </div>
 
-  <hr class="divider">
+  <!-- Лист 2 -->
+  <div class="page" contenteditable="true" spellcheck="false" data-page="2">
+    <h1>Текст 2: Второй раздел</h1>
+    <p>Это второй текст, он находится на отдельном листе. Как видишь, это настоящий отдельный белый лист с тенью.</p>
+    <p>Все три листа идут друг за другом, и каждый можно редактировать независимо.</p>
+  </div>
 
-  <h1>Текст 2: Второй раздел</h1>
-  <p>Это второй текст, теперь он идет прямо на этом же листе. Нам больше не нужно переключать вкладки — просто скролль вниз.</p>
-  <p>Все три текста находятся в одном файле, и каждый из них можно редактировать независимо.</p>
-
-  <hr class="divider">
-
-  <h1>Текст 3: Заключение</h1>
-  <p>А это третий текст. Документ выглядит точь-в-точь как настоящий лист из Google Docs.</p>
-  <p>Все твои изменения будут сохраняться в браузере (localStorage) автоматически. Даже если ты закроешь вкладку, текст останется на месте!</p>
+  <!-- Лист 3 -->
+  <div class="page" contenteditable="true" spellcheck="false" data-page="3">
+    <h1>Текст 3: Заключение</h1>
+    <p>А это третий текст на третьем листе. Документ выглядит точь-в-точь как настоящие страницы из Google Docs.</p>
+    <p>Все твои изменения будут сохраняться в браузере (localStorage) автоматически. Даже если ты закроешь вкладку, тексты останутся на месте!</p>
+  </div>
 
 </div>
 
 <div class="status" id="status">Сохранено</div>
 
 <script>
-  const page = document.querySelector('.page');
+  const pages = document.querySelectorAll('.page');
   const status = document.getElementById('status');
-  const KEY = 'experiment_doc_single_page';
+  
+  // Ключи для сохранения каждого листа отдельно
+  const KEYS = ['doc_page_1', 'doc_page_2', 'doc_page_3'];
 
-  // Загрузка сохранённого текста
-  const saved = localStorage.getItem(KEY);
-  if (saved) {
-    page.innerHTML = saved;
-  }
+  // Загрузка сохранённых текстов
+  pages.forEach((page, index) => {
+    const saved = localStorage.getItem(KEYS[index]);
+    if (saved) {
+      page.innerHTML = saved;
+    }
+  });
 
-  // Автосохранение
+  // Автосохранение при вводе
   let timer;
-  page.addEventListener('input', () => {
-    localStorage.setItem(KEY, page.innerHTML);
-    status.classList.add('show');
-    clearTimeout(timer);
-    timer = setTimeout(() => status.classList.remove('show'), 1000);
+  pages.forEach((page, index) => {
+    page.addEventListener('input', () => {
+      localStorage.setItem(KEYS[index], page.innerHTML);
+      
+      // Показываем плашку "Сохранено"
+      status.classList.add('show');
+      clearTimeout(timer);
+      timer = setTimeout(() => status.classList.remove('show'), 1000);
+    });
   });
 </script>
 
