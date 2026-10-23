@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Эксперимент — док</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: #f1f3f4;
+    font-family: Arial, sans-serif;
+  }
+
+  /* Верхняя панель */
+  .toolbar {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: #fff;
+    border-bottom: 1px solid #dadce0;
+    padding: 6px 16px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 14px;
+    color: #444;
+  }
+  .toolbar .item {
+    padding: 6px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    user-select: none;
+  }
+  .toolbar .item:hover { background: #f1f3f4; }
+  .toolbar .title {
+    margin-left: auto;
+    color: #5f6368;
+    font-size: 13px;
+  }
+
+  /* Вкладки-переключатели */
+  .tabs {
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    margin: 16px 0 0;
+  }
+  .tabs button {
+    padding: 6px 16px;
+    border: 1px solid #dadce0;
+    background: #fff;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 13px;
+    color: #3c4043;
+  }
+  .tabs button.active {
+    background: #e8f0fe;
+    border-color: #1a73e8;
+    color: #1a73e8;
+  }
+
+  /* Лист */
+  .page {
+    background: #fff;
+    width: 816px;
+    min-height: 1056px;
+    margin: 20px auto 60px;
+    padding: 96px;
+    box-shadow: 0 1px 3px rgba(60,64,67,.3);
+    font-family: Georgia, serif;
+    font-size: 15px;
+    line-height: 1.6;
+    color: #202124;
+    outline: none;
+  }
+  .page h1 {
+    font-family: Arial, sans-serif;
+    font-size: 26px;
+    margin-top: 0;
+  }
+  .page:focus { box-shadow: 0 1px 3px rgba(60,64,67,.3), 0 0 0 2px #a8c7fa; }
+
+  .text-block { display: none; }
+  .text-block.active { display: block; }
+
+  .status {
+    position: fixed;
+    bottom: 16px;
+    right: 16px;
+    background: #323232;
+    color: #fff;
+    font-size: 12px;
+    padding: 8px 14px;
+    border-radius: 4px;
+    opacity: 0;
+    transition: opacity .3s;
+    pointer-events: none;
+  }
+  .status.show { opacity: 1; }
+</style>
+</head>
+<body>
+
+<div class="toolbar">
+  <div class="item">Файл</div>
+  <div class="item">Правка</div>
+  <div class="item">Вид</div>
+  <div class="item">Вставка</div>
+  <div class="item">Формат</div>
+  <div class="title">Эксперимент</div>
+</div>
+
+<div class="tabs">
+  <button class="active" data-tab="0">Текст 1</button>
+  <button data-tab="1">Текст 2</button>
+  <button data-tab="2">Текст 3</button>
+</div>
+
+<div class="page" contenteditable="true" spellcheck="false">
+  <div class="text-block active" data-block="0">
+    <h1>Текст 1</h1>
+    <p>Это первый текст. Кликни сюда и редактируй — всё сохранится автоматически.</p>
+  </div>
+  <div class="text-block" data-block="1">
+    <h1>Текст 2</h1>
+    <p>Это второй текст. Переключись на него кнопкой сверху.</p>
+  </div>
+  <div class="text-block" data-block="2">
+    <h1>Текст 3</h1>
+    <p>Это третий текст. Каждый блок хранится отдельно в localStorage.</p>
+  </div>
+</div>
+
+<div class="status" id="status">Сохранено</div>
+
+<script>
+  const blocks = document.querySelectorAll('.text-block');
+  const tabs = document.querySelectorAll('.tabs button');
+  const page = document.querySelector('.page');
+  const status = document.getElementById('status');
+  const KEY = 'experiment_doc_v1';
+
+  // Загрузка сохранённого
+  const saved = JSON.parse(localStorage.getItem(KEY) || '{}');
+  blocks.forEach((b, i) => {
+    if (saved['block' + i] !== undefined) b.innerHTML = saved['block' + i];
+  });
+
+  // Переключение текстов
+  tabs.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const i = btn.dataset.tab;
+      tabs.forEach(b => b.classList.toggle('active', b === btn));
+      blocks.forEach(b => b.classList.toggle('active', b.dataset.block === i));
+    });
+  });
+
+  // Автосохранение
+  let timer;
+  function showStatus() {
+    status.classList.add('show');
+    clearTimeout(timer);
+    timer = setTimeout(() => status.classList.remove('show'), 1200);
+  }
+
+  page.addEventListener('input', () => {
+    const data = {};
+    blocks.forEach((b, i) => data['block' + i] = b.innerHTML);
+    localStorage.setItem(KEY, JSON.stringify(data));
+    showStatus();
+  });
+</script>
+
+</body>
+</html>
