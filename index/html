@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Мой планировщик</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+  <h1>📅 Мой планировщик</h1>
+  <nav>
+    <button class="nav-btn active" data-page="week">Неделя</button>
+    <button class="nav-btn" data-page="month">Месяц</button>
+    <button class="nav-btn" data-page="year">Год</button>
+    <button class="nav-btn" data-page="habits">Трекеры</button>
+    <button class="nav-btn" data-page="subjects">Учёба</button>
+  </nav>
+  <div class="data-btns">
+    <button id="exportBtn">💾 Экспорт</button>
+    <label class="import-label">📂 Импорт<input type="file" id="importInput" accept=".json" hidden></label>
+  </div>
+</header>
+
+<main>
+  <section id="page-week" class="page active">
+    <div class="page-header">
+      <button id="weekPrev">←</button>
+      <span id="weekLabel"></span>
+      <button id="weekNext">→</button>
+    </div>
+    <div id="weekGrid" class="week-grid"></div>
+  </section>
+
+  <section id="page-month" class="page">
+    <div class="page-header">
+      <button id="monthPrev">←</button>
+      <span id="monthLabel"></span>
+      <button id="monthNext">→</button>
+    </div>
+    <div id="monthGrid" class="month-grid"></div>
+    <div id="monthDayTasks" class="day-tasks"></div>
+  </section>
+
+  <section id="page-year" class="page">
+    <div class="page-header">
+      <button id="yearPrev">←</button>
+      <span id="yearLabel"></span>
+      <button id="yearNext">→</button>
+    </div>
+    <div id="yearGrid" class="year-grid"></div>
+  </section>
+
+  <section id="page-habits" class="page">
+    <h2>Трекер привычек</h2>
+    <div class="add-row">
+      <input id="habitInput" placeholder="Новая привычка...">
+      <button id="addHabit">Добавить</button>
+    </div>
+    <div id="habitList" class="habit-list"></div>
+  </section>
+
+  <section id="page-subjects" class="page">
+    <h2>Учебные предметы</h2>
+    <div class="add-row">
+      <input id="subjectInput" placeholder="Новый предмет...">
+      <button id="addSubject">Добавить</button>
+    </div>
+    <div id="subjectList" class="subject-list"></div>
+  </section>
+</main>
+
+<script src="app.js"></script>
+</body>
+</html>
